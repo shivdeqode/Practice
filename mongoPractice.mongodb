@@ -1,0 +1,75 @@
+// MongoDB Playground
+// To disable this template go to Settings | MongoDB | Use Default Template For Playground.
+// Make sure you are connected to enable completions and to be able to run a playground.
+// Use Ctrl+Space inside a snippet or a string literal to trigger completions.
+
+// Select the database to use.
+use('testdb');
+
+// The drop() command destroys all data from a collection.
+// Make sure you run it against the correct database and collection.
+db.employee.drop();
+
+// Insert a few documents into the testdb collection.
+db.employee.insertMany([
+  { 'empNo': 1, 'fName': 'abc', 'age': 10, 'lName': 2, size: { h: 10, w: 15.25, uom: "cm" },'date': new Date('2014-03-01T08:00:00Z') },
+  { 'empNo': 2, 'fName': 'j.kl', 'age': 20, 'lName': 1, size: { h: 9, w: 15.25, uom: "cm" },'date': new Date('2014-03-01T09:00:00Z') },
+  { 'empNo': 3, 'fName': 'efg', 'age': 5, 'lName': 10, size: { h: 8, w: 15.25, uom: "cm" },'date': new Date('2014-03-15T09:00:00Z') },
+  { 'empNo': 4, 'fName': 'xyz', 'age': 5, 'lName':  20, size: { h: 10, w: 15.25, uom: "cm" },'date': new Date('2014-04-04T11:21:39.736Z') },
+  { 'empNo': 5, 'fName': 'abc', 'age': 10, 'lName': 10, 'date': new Date('2014-04-04T21:23:13.331Z') },
+  { 'empNo': 6, 'fName': 'def', 'age': 7.5, 'lName': 5, 'date': new Date('2015-06-04T05:08:13Z') },
+  { 'empNo': 7, 'fName': 'def', 'age': 7.5, 'lName': 10, 'date': new Date('2015-09-10T08:43:00Z') },
+  { 'empNo': 8, 'fName': 'lmn', 'age': 1, 'lName': 5, 'date': new Date('2011-02-06T20:20:13Z') },
+]);
+
+//count Number of documents in collection
+db.employee.countDocuments();
+db.employee.countDocuments( { date: { $gt: new Date('01/01/2012') } } );
+
+//Basic Read
+db.employee.find({}).pretty();
+
+db.employee.find({'empNo':1}).pretty();
+
+db.employee.findOne();
+
+db.employee.find({$and:[ {'fName' :'xyz'},{'size.h':10}]});
+
+// db.employee.find({fName :'def'}).forEach(printjson);
+
+//get count
+db.employee.find( { age: { $gt: 5 } } ).count();
+db.employee.find( { date: { $gt: new Date('01/01/2012') } } ).pretty();
+
+//Like Operator /.*like.*/ or /like/ or /.*like/
+db.employee.find({"fName": /.*kl/});
+
+//Or Operator similarly NOR
+db.employee.find( { $or: [ { age: { $gt: 20 } }, { empNo: 1 } ] } );
+db.employee.find( {$or: [ { fName :'jkl' },{ age: { $lte :10 } } ] } );
+
+//in Operator
+db.employee.find({"fName":{$in:["xyz", "abc", "j.kl"]}}).pretty();
+
+//And Operator
+db.employee.find({$and:[ {'fName':'efg'},{"lName": 10 } ]}).pretty();
+
+//And Or Together
+db.employee.find({'empNo':{$gt:1},$or:[ {'fName':'efg'},{"lName": 10 } ]}).pretty();
+
+//Not Operator
+db.employee.find( { 'age': { $not: { $gt: 4} } } );
+
+//Update 
+db.employee.updateOne({ age: 5 }, { $set: { age: 9 }});
+db.employee.updateMany({'size.h': 5},{$set:{'size.h':3}, $currentDate: { lastModifiedDate: true }});
+
+db.employee.updateOne({ fName : 'efg' }, { $set: { age: '9' }});
+db.employee.find({'fName':'efg'}).pretty();
+
+db.employee.find({'size.h':3}).pretty();
+db.employee.deleteOne({'fName':'abc'});
+
+
+
+
