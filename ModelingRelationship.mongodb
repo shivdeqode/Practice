@@ -1,0 +1,94 @@
+/*For Referenced Data Relationship insert only address document & referenced document*/
+// Select the database to use.
+use('users');
+
+db.users.drop();
+db.address.drop();
+
+//insert name document
+db.users.insertOne({
+   "_id":ObjectId("52ffc33cd85242f436000001"),
+   "name": "Tom Hanks",
+   "contact": "987654321",
+   "dob": "01-01-1991"
+});
+
+//insert address document
+db.address.insertMany
+([{
+   "_id":ObjectId("52ffc4a5d85242602e000000"),
+   "building": "22 A, Indiana Apt",
+   "pincode": 123456,
+   "city": "Los Angeles",
+   "state": "California"
+},
+{
+  "_id":ObjectId("52ffc4a5d85242602e000001"),
+  "building": "170 A, Acropolis Apt",
+	"pincode": 456789,
+	"city": "Chicago",
+	"state": "Illinois"
+}]) ;
+
+db.address.find().pretty();
+
+//Modeling Embedded Relationships
+db.users.insertOne({
+	
+		"_id":ObjectId("52ffc33cd85242f436000001"),
+		"contact": "987654321",
+		"dob": "01-01-1991",
+		"name": "Tom Benzamin",
+		"address": [
+			{
+				"building": "22 A, Indiana Apt",
+				"pincode": 123456,
+				"city": "Los Angeles",
+				"state": "California"
+			},
+			{
+				"building": "170 A, Acropolis Apt",
+				"pincode": 456789,
+				"city": "Chicago",
+				"state": "Illinois"
+			}
+		]
+	}
+);
+
+db.users.findOne({"name":"Tom Benzamin"},{"address":1});
+db.users.findOne({},{"name":"Tom Benzamin","address":1});
+
+//Modeling Referenced Relationships
+db.users.insertOne({
+	
+		"_id":ObjectId("52ffc33cd85242f436000001"),
+		"contact": "987654321",
+		"dob": "01-01-1991",
+		"name": "Tom Benzamin",
+		"address": [
+	    ObjectId("52ffc4a5d85242602e000000"),
+        ObjectId("52ffc4a5d85242602e000001")
+		]
+	}
+);
+
+db.users.find().pretty();
+// var result = db.users.findOne({"name":"Tom Benzamin"},{"address_ids":1});
+// var addresses = db.address.find({"_id":{"$in":result["address_ids"]}});
+
+
+db.users.aggregate([{/**
+ * from: The target collection.
+ * localField: The local join field.
+ * foreignField: The target join field.
+ * as: The name for the results.
+ * pipeline: The pipeline to run on the joined collection.
+ * let: Optional variables to use in the pipeline field stages.
+ */
+$lookup: {
+  from: "address", // Collection address
+  localField: "address",
+  foreignField: "_id",
+  as: "address"
+}}]);
